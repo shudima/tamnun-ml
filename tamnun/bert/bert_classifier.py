@@ -13,7 +13,7 @@ class BertClassifier(TorchEstimator):
     is determined automatically by the shape of the target variable.
     """
     def __init__(self, num_of_classes, bert_model_name=BERT_BASE_UNCASED_MODEL_NAME, verbose=True,
-                 bert_initial_model=None, lr=1e-3):
+                 bert_initial_model=None, lr=1e-3, optimizer=None):
         """
         bert_model:  The name of the BERT model to use (default is 'bert-base-multilingual-cased'). Accepts one if the values from here: https://github.com/huggingface/pytorch-pretrained-BERT/blob/98dc30b21e3df6528d0dd17f0910ffea12bc0f33/pytorch_pretrained_bert/modeling.py#L36
         verbose:  If True (by default, outputs the training progress (epochs, steps and loss)
@@ -22,4 +22,8 @@ class BertClassifier(TorchEstimator):
         module = BertForClassification(num_of_classes,
                                        bert_model_name=bert_model_name,
                                        bert_initial_model=bert_initial_model)
-        super().__init__(module, input_dtype=torch.long, optimizer=AdamW(module.parameters(), lr=lr), verbose=verbose)
+
+        if optimizer is None:
+            optimizer = AdamW(module.parameters(), lr=lr)
+
+        super().__init__(module, input_dtype=torch.long, optimizer=optimizer, verbose=verbose)
